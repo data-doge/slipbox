@@ -1,6 +1,7 @@
 class MessagesController < ApplicationController
   def create
-    message = Message.create(from: params["From"], sid: params["CallSid"])
+    # TODO: budget check
+    Message.find_or_create_by(from: params["From"], sid: params["CallSid"])
     response = Twilio::TwiML::VoiceResponse.new
     response.gather(method: "POST", action: "#{ENV["base_uri"]}/messages/process_input") do |gather|
       gather.play(url: "#{ENV["base_uri"]}/intro.mp3")
@@ -21,6 +22,8 @@ class MessagesController < ApplicationController
         recordingStatusCallbackMethod: "POST",
         recordingStatusCallback: "#{ENV['base_uri']}/messages/voicemail?call_sid=#{sid}"
       )
+    else
+      response.redirect(messages_url, method: 'POST')
     end
     render xml: response
   end
