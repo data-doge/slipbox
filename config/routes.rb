@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :messages, only: :create do
     collection do
-      post :complete
+      post :voicemail
     end
   end
 end
